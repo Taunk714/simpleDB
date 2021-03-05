@@ -93,7 +93,7 @@ public class Join extends Operator {
 //            children[1].rewind();
 //        }
 //        newtuples = tuples.iterator();
-        Hashtable<Integer, ArrayList<Tuple>> buckets = new Hashtable<>();
+        HashMap<Integer, ArrayList<Tuple>> buckets = new HashMap<>();
         Tuple currentLeft;
         Tuple currentRight;
         int key = 0;

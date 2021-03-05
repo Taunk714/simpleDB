@@ -60,7 +60,7 @@ public class HashEquiJoin extends Operator {
         super.open();
         children[0].open();
         children[1].open();
-        Hashtable<Integer, ArrayList<Tuple>> buckets = new Hashtable<>();
+        HashMap<Integer, ArrayList<Tuple>> buckets = new HashMap<>();
         Tuple currentHash;
         int key;
         newTuples = new ArrayList<>();
