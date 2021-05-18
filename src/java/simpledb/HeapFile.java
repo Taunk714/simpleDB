@@ -2,6 +2,7 @@ package simpledb;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * HeapFile is an implementation of a DbFile that stores a collection of tuples
@@ -121,19 +122,28 @@ public class HeapFile implements DbFile {
         ArrayList<Page> dirty = new ArrayList<>();
         for (int i = 0; i < numPages(); i++) {
             pid = new HeapPageId(getId(),i);
-            page = (HeapPage)Database.getBufferPool().getPage(tid,pid,Permissions.READ_WRITE);
+            page = (HeapPage)Database.getBufferPool().getPage(tid,pid,Permissions.READ_ONLY);
+
             if (page.getNumEmptySlots() > 0){
-                page.insertTuple(t);
-                dirty.add(page);
-                return dirty;
+                synchronized (page){
+                    if (page.getNumEmptySlots()>0){
+                        page = (HeapPage) Database.getBufferPool().getPage(tid, pid, Permissions.READ_WRITE);
+                        page.insertTuple(t);
+                        dirty.add(page);
+                        return dirty;
+                    }
+                }
             }
+            Database.getBufferPool().releasePage(tid,pid);
         }
 
-        pid = new HeapPageId(getId(),numPages());
-        page = new HeapPage(pid, HeapPage.createEmptyPageData());
-        writePage(page);
-        page = (HeapPage)Database.getBufferPool().getPage(tid,pid,Permissions.READ_WRITE);
-        page.insertTuple(t);
+        synchronized (this){
+            pid = new HeapPageId(getId(),numPages());
+            page = new HeapPage(pid, HeapPage.createEmptyPageData());
+            writePage(page);
+            page = (HeapPage)Database.getBufferPool().getPage(tid,pid,Permissions.READ_WRITE);
+            page.insertTuple(t);
+        }
         dirty.add(page);
         return dirty;
 

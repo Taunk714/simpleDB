@@ -1,6 +1,7 @@
 package simpledb;
 
 import java.lang.Exception;
+import java.util.HashMap;
 
 /** Exception that is thrown when a transaction has aborted. */
 public class TransactionAbortedException extends Exception {

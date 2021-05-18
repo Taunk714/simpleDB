@@ -1,6 +1,7 @@
 package simpledb;
 
 import java.util.Objects;
+import java.util.Scanner;
 
 /** Unique identifier for HeapPage objects. */
 public class HeapPageId implements PageId {
